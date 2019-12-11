@@ -1,0 +1,28 @@
+x = x(:)';
+n = length(x);
+switch tptr
+    case 'rigrsure'
+        sx2 = sort(abs(x)).^2;
+        risks = (n-(2*(1:n))+(cumsum(sx2)+(n-1:-1:0).*sx2))/n;
+        [~,best] = min(risks);
+        thr = sqrt(sx2(best));
+
+    case 'heursure'
+        hthr = sqrt(2*log(n));
+        eta = (norm(x).^2-n)/n;
+        crit = (log(n)/log(2))^(1.5)/sqrt(n);
+        if eta < crit
+            thr = hthr;
+        else
+            thr = min(thselect(x,'rigrsure'),hthr);
+        end
+
+    case 'sqtwolog'
+        thr = sqrt(2*log(n));
+
+    case 'minimaxi'
+        if n <= 32
+            thr = 0;
+        else
+            thr = 0.3936 + 0.1829*(log(n)/log(2));
+        end
